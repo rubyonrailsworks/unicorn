@@ -8,10 +8,11 @@ module Unicorn
   # tag TCP sockets so we can use TCP_INFO under Linux without
   # incurring extra syscalls for Unix domain sockets.
   # TODO: remove these when we remove kgio
-  TCPClient = Class.new(Kgio::Socket) # :nodoc:
+  TCPClient = TCPSocket # :nodoc:
   class TCPSrv < Kgio::TCPServer # :nodoc:
     def kgio_tryaccept # :nodoc:
-      super(TCPClient)
+      client = accept_nonblock(exception: false)
+      client == :wait_readable ? false : client
     end
   end
 

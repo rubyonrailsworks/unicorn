@@ -6,6 +6,18 @@ advantage of features in Unix/Unix-like kernels.  Slow clients should
 only be served by placing a reverse proxy capable of fully buffering
 both the the request and response in between unicorn and slow clients.
 
+== Fork Note
+
+This repository is maintained by Ruby on Rails Works as a compatibility
+fork for Ruby 4 / Rails 7.2 deployments.
+
+The primary delta from upstream unicorn 6.1.0 is removal of the legacy
+kgio runtime dependency, replaced here with a small Ruby compatibility
+layer so unicorn can continue to accept requests under Ruby 4.
+
+This fork should be treated as an application-maintained dependency, not
+as an upstream unicorn mirror.
+
 == Features
 
 * Designed for Rack, Unix, fast clients, and ease-of-debugging.  We
