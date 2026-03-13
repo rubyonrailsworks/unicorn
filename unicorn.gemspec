@@ -1,12 +1,14 @@
 # -*- encoding: binary -*-
-manifest = File.exist?('.manifest') ?
-  IO.readlines('.manifest').map!(&:chomp!) : `git ls-files`.split("\n")
+root = __dir__
+manifest_path = File.join(root, '.manifest')
+manifest = File.exist?(manifest_path) ?
+  IO.readlines(manifest_path, chomp: true) : Dir.chdir(root) { `git ls-files`.split("\n") }
 
 # don't bother with tests that fork, not worth our time to get working
 # with `gem check -t` ... (of course we care for them when testing with
 # GNU make when they can run in parallel)
 test_files = manifest.grep(%r{\Atest/unit/test_.*\.rb\z}).map do |f|
-  File.readlines(f).grep(/\bfork\b/).empty? ? f : nil
+  File.readlines(File.join(root, f)).grep(/\bfork\b/).empty? ? f : nil
 end.compact
 
 Gem::Specification.new do |s|
@@ -14,12 +16,12 @@ Gem::Specification.new do |s|
   s.version = (ENV['VERSION'] || '6.1.0').dup
   s.authors = ['unicorn hackers']
   s.summary = 'Rack HTTP server for fast clients and Unix'
-  s.description = File.read('README').split("\n\n")[1]
+  s.description = File.read(File.join(root, 'README')).split("\n\n")[1]
   s.email = %q{unicorn-public@yhbt.net}
   s.executables = %w(unicorn unicorn_rails)
   s.extensions = %w(ext/unicorn_http/extconf.rb)
-  s.extra_rdoc_files = IO.readlines('.document').map!(&:chomp!).keep_if do |f|
-    File.exist?(f)
+  s.extra_rdoc_files = IO.readlines(File.join(root, '.document'), chomp: true).keep_if do |f|
+    File.exist?(File.join(root, f))
   end
   s.files = manifest
   s.homepage = 'https://yhbt.net/unicorn/'
